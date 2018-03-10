@@ -79,33 +79,6 @@ int main(int argc, char* argv[]) {
         }
         printf("\n");
 
-        discMove(&Rod1, &Rod3);
-        discMove(&Rod1, &Rod2);
-        discMove(&Rod3, &Rod2);
-        discMove(&Rod1, &Rod3);
-        discMove(&Rod2, &Rod1);
-        discMove(&Rod2, &Rod3);
-        discMove(&Rod1, &Rod3);
-
-        printf("\n=======");
-        printf("Rod 1, position: %d\n", Rod1.position);
-        for (int j = 0; j < DISCS; j++) {
-            printf("%d\t", Rod1.stack[j]);
-        }
-
-        printf("\n");
-        printf("Rod 2, position: %d\n", Rod2.position);
-        for (int j = 0; j < DISCS; j++) {
-            printf("%d\t", Rod2.stack[j]);
-        }
-
-        printf("\n");
-        printf("Rod 3, position: %d\n", Rod3.position);
-        for (int j = 0; j < DISCS; j++) {
-            printf("%d\t", Rod3.stack[j]);
-        }
-        printf("\n");
-
         cleanScreen();
         updateScreen(); //Refreshing the screen
         SDL_Delay(1000 / FPS_RATE); //Setting FPS cap
@@ -139,7 +112,7 @@ int main(int argc, char* argv[]) {
                 }
         }*/
 
-        /*if (isKeyDown(SDLK_1))
+        if (isKeyDown(SDLK_1))
             {discMove(&Rod1, &Rod2);}
         else if (isKeyDown(SDLK_2))
             {discMove(&Rod1, &Rod3);}
@@ -152,7 +125,7 @@ int main(int argc, char* argv[]) {
         else if (isKeyDown(SDLK_6))
             {discMove(&Rod3, &Rod2);}
         else if (isKeyDown(SDLK_ESCAPE))
-            {exit(1);}*/
+            {exit(1);}
 
         if (Rod3.position == DISCS - 1) {
             printf("\nWELL DONE YOU WON!\n");
@@ -169,12 +142,12 @@ void cleanScreen() {
 }
 
 void discMove(Rod *a, Rod *b) {
+    //This function moves the disc by popping it and pushing into another stack (Rod)
     if (a->position != -1) {
         int disctopush = a->stack[a->position];
-        a->stack[a->position] = 0;
-        a->position = a->position - 1;
-
         if (b->stack[b->position] < disctopush) {
+            a->stack[a->position] = 0;
+            a->position = a->position - 1;
             b->position = b->position + 1;
             b->stack[b->position] = disctopush;
         }
