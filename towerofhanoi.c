@@ -63,18 +63,14 @@ int main(int argc, char* argv[]) {
     Rod3.base_y2 = Rod1.base_y2;
 
     for (int i = 0; i < DISCS; i++) {
-        disc_x1cords[i] = x1 - displacement - blockwidth + 10 * (Rod1.stack[i]);
-        disc_y1cords[i] = screenHeight() - 25 * (Rod1.stack[i] - 1);
-        disc_x2cords[i] = x2 - displacement + blockwidth - 10 * (Rod1.stack[i]);
-        disc_y2cords[i] = screenHeight() - 20 - 25 * (Rod1.stack[i] - 1);
+        disc_x1cords[i] = x1 - displacement - blockwidth + 10 * (Rod1.stack[DISCS - i - 1] - 1);
+        disc_y1cords[i] = screenHeight() - 25 * (Rod1.stack[DISCS - i - 1] - 1);
+        disc_x2cords[i] = x2 - displacement + blockwidth - 10 * (Rod1.stack[DISCS - i - 1] - 1);
+        disc_y2cords[i] = screenHeight() - 20 - 25 * (Rod1.stack[DISCS - i - 1] - 1);
+        printf("%d, %d, %d, %d\n", disc_x1cords[i], disc_y1cords[i], disc_x2cords[i], disc_y2cords[i]);
     }
 
-    //for (int i = 0; i < DISCS; i++)
-    //    printf("%d, %d, %d, %d\n", disc_x1cords[i], disc_y1cords[i], disc_x2cords[i], disc_y2cords[i]);
-
     while(1) {
-
-
         printf("===============\n");
         for (int i = 0; i < DISCS; i++) {
             printf("%d, %d, %d, %d\n", disc_x1cords[i], disc_y1cords[i], disc_x2cords[i], disc_y2cords[i]);
@@ -191,10 +187,10 @@ void discMove(Rod *a, Rod *b) {
         int disctopush = a->stack[a->position];
         if (b->stack[b->position] > disctopush || b->position == -1) {
 
-            disc_x1cords[disctopush - 1] = b->base_x1 + 10 * (a->stack[a->position]);
-            disc_y1cords[disctopush - 1] = b->base_y1 - 25 * (b->position + 1);
-            disc_x2cords[disctopush - 1] = b->base_x2 - 10 * (a->stack[a->position]);
-            disc_y2cords[disctopush - 1] = b->base_y2 - 25 * (b->position + 1);
+            disc_x1cords[DISCS - disctopush] = b->base_x1 + 10 * (DISCS - a->stack[a->position]);
+            disc_y1cords[DISCS - disctopush] = b->base_y1 - 25 * (b->position + 1);
+            disc_x2cords[DISCS - disctopush] = b->base_x2 - 10 * (DISCS - a->stack[a->position]);
+            disc_y2cords[DISCS - disctopush] = b->base_y2 - 25 * (b->position + 1);
 
             a->stack[a->position] = 0;
             a->position = a->position - 1;
