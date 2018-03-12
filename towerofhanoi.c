@@ -17,7 +17,9 @@ typedef struct Rod {
 int disc_x1cords[DISCS], disc_y1cords[DISCS], disc_x2cords[DISCS], disc_y2cords[DISCS];
 
 void cleanScreen();
+void drawRods(int x1, int y1, int x2, int y2, int displacement);
 void discMove(Rod *a, Rod *b);
+void testPrint(Rod *x, Rod *y, Rod *z);
 
 int main(int argc, char* argv[]) {
 
@@ -25,7 +27,7 @@ int main(int argc, char* argv[]) {
         exit(3);
     }
 
-    int x1, y1, x2, y2, rod_width = 17, rod_height = 170, displacement = 200, blockwidth = 50;
+    int x1, y1, x2, y2, rod_width = 17, rod_height = 170, displacement = 200, blockwidth = 70;
 
     x1 = screenWidth() / 2 - rod_width;
     y1 = rod_height;
@@ -71,36 +73,10 @@ int main(int argc, char* argv[]) {
     }
 
     while(1) {
-        printf("===============\n");
-        for (int i = 0; i < DISCS; i++) {
-            printf("%d, %d, %d, %d\n", disc_x1cords[i], disc_y1cords[i], disc_x2cords[i], disc_y2cords[i]);
-        }
-        //TEST PRINTS
-        printf("\n");
-        printf("Rod 1, position: %d\n", Rod1.position);
-        for (int j = 0; j < DISCS; j++) {
-            printf("%d\t", Rod1.stack[j]);
-        }
 
-        printf("\n");
-        printf("Rod 2, position: %d\n", Rod2.position);
-        for (int j = 0; j < DISCS; j++) {
-            printf("%d\t", Rod2.stack[j]);
-        }
-
-        printf("\n");
-        printf("Rod 3, position: %d\n", Rod3.position);
-        for (int j = 0; j < DISCS; j++) {
-            printf("%d\t", Rod3.stack[j]);
-        }
-        printf("\n");
-
+        testPrint(&Rod1, &Rod2, &Rod3);
         cleanScreen();
-
-        //Drawing the rods
-        filledRect(x1, y1, x2, y2, WHITE);
-        filledRect(x1 - displacement, y1, x2 - displacement, y2, WHITE);
-        filledRect(x1 + displacement, y1, x2 + displacement, y2, WHITE);
+        drawRods(x1, y1, x2, y2, displacement);
 
         for (int i = 0; i < DISCS; i++) {
             filledRect(
@@ -111,40 +87,6 @@ int main(int argc, char* argv[]) {
                 RED
             );
         }
-
-        /*//Drawing the discs
-        //ROD1
-        for (int i = 0; i <= Rod1.position; i++) {
-            filledRect(
-                x1 - displacement - blockwidth + 10 * (Rod1.stack[i] - 1),
-                screenHeight() - 25 * (Rod1.position - i),
-                x2 - displacement + blockwidth - 10 * (Rod1.stack[i] - 1),
-                screenHeight() - 20 - 25 * (Rod1.position - i),
-                RED
-            );
-        }
-
-        //ROD2
-        for (int i = 0; i <= Rod2.position; i++) {
-            filledRect(
-                x1 - blockwidth + 10 * (Rod2.stack[i] - 1),
-                screenHeight() - 25 * (Rod2.position - i),
-                x2 + blockwidth - 10 * (Rod2.stack[i] - 1),
-                screenHeight() - 20 - 25 * (Rod2.position - i),
-                RED
-            );
-        }
-
-        //ROD3
-        for (int i = 0; i <= Rod3.position; i++) {
-            filledRect(
-                x1 + displacement - blockwidth + 10 * (Rod3.stack[i] - 1),
-                screenHeight() - 25 * (Rod3.position - i),
-                x2 + displacement + blockwidth - 10 * (Rod3.stack[i] - 1),
-                screenHeight() - 20 - 25 * (Rod3.position - i),
-                RED
-            );
-        }*/
 
         updateScreen(); //Refreshing the screen
         SDL_Delay(1000 / FPS_RATE); //Setting FPS cap
@@ -181,6 +123,12 @@ void cleanScreen() {
 	filledRect(0, 0, screenWidth(), screenHeight(), BLACK);
 }
 
+void drawRods(int x1, int y1, int x2, int y2, int displacement) {
+    filledRect(x1, y1, x2, y2, WHITE);
+    filledRect(x1 - displacement, y1, x2 - displacement, y2, WHITE);
+    filledRect(x1 + displacement, y1, x2 + displacement, y2, WHITE);
+}
+
 void discMove(Rod *a, Rod *b) {
     //This function moves the disc by popping it and pushing into another stack (Rod)
     if (a->position != -1) {
@@ -198,4 +146,31 @@ void discMove(Rod *a, Rod *b) {
             b->stack[b->position] = disctopush;
         }
     }
+}
+
+void testPrint(Rod *x, Rod *y, Rod *z) {
+    //Function printing all the crucial parametres of the particles
+    //Use it for testing/debugging
+    printf("===============\n");
+    for (int i = 0; i < DISCS; i++) {
+        printf("%d, %d, %d, %d\n", disc_x1cords[i], disc_y1cords[i], disc_x2cords[i], disc_y2cords[i]);
+    }
+    printf("\n");
+    printf("Rod 1, position: %d\n", x->position);
+    for (int j = 0; j < DISCS; j++) {
+        printf("%d\t", x->stack[j]);
+    }
+
+    printf("\n");
+    printf("Rod 2, position: %d\n", y->position);
+    for (int j = 0; j < DISCS; j++) {
+        printf("%d\t", y->stack[j]);
+    }
+
+    printf("\n");
+    printf("Rod 3, position: %d\n", z->position);
+    for (int j = 0; j < DISCS; j++) {
+        printf("%d\t", z->stack[j]);
+    }
+    printf("\n");
 }
