@@ -3,19 +3,14 @@
 #include <math.h>
 
 #define FPS_RATE 60
-#define DISCS 3
+#define DISCS 6
 #define rod_width 17
 #define rod_height 170
 #define displacement 200
 #define blockwidth 70
 
 typedef struct Rod {
-    int position;
-    int stack[DISCS];
-    int base_x1;
-    int base_y1;
-    int base_x2;
-    int base_y2;
+    int position, stack[DISCS], base_x1, base_y1, base_x2, base_y2;
 } Rod;
 
 int disc_x1cords[DISCS], disc_y1cords[DISCS], disc_x2cords[DISCS], disc_y2cords[DISCS];
@@ -139,7 +134,7 @@ void discMove(Rod *a, Rod *b) {
                 drawRods(x1, y1, x2, y2, displacement);
                 drawDiscs();
                 updateScreen();
-                SDL_Delay(1000 / FPS_RATE);
+                SDL_Delay(1000 / 600);
             } while (disc_y1cords[DISCS - disctopush] != b->base_y1 - 25 * (b->position + 1));
 
             a->stack[a->position] = 0;
