@@ -25,6 +25,8 @@ void drawRods(int xcord1, int ycord1, int xcord2, int ycord2, int disp);
 void discMove(Rod *a, Rod *b);
 void drawDiscs();
 void checkWin(Rod *goal);
+void drawIndicator(int current_position, int xcord);
+int keyDetect(int indicator_position, Rod *Rod1, Rod *Rod2, Rod *Rod3);
 void testPrint(Rod *x, Rod *y, Rod *z);
 
 int main(int argc, char* argv[]) {
@@ -73,29 +75,18 @@ int main(int argc, char* argv[]) {
         disc_y2cords[i] = screenHeight() - 20 - 25 * (Rod1.stack[DISCS - i - 1] - 1);
     }
 
+    int indicator_position = 1;
+
     while(1) {
-        //testPrint(&Rod1, &Rod2, &Rod3);
         cleanScreen();
         drawRods(x1, y1, x2, y2, displacement);
         drawDiscs();
+        drawIndicator(indicator_position, x1);
         updateScreen(); //Refreshing the screen
         SDL_Delay(1000 / FPS_RATE); //Setting FPS cap
         checkWin(&Rod3);
-
-        if (isKeyDown(SDLK_1))
-            discMove(&Rod1, &Rod2);
-        else if (isKeyDown(SDLK_2))
-            discMove(&Rod1, &Rod3);
-        else if (isKeyDown(SDLK_3))
-            discMove(&Rod2, &Rod1);
-        else if (isKeyDown(SDLK_4))
-            discMove(&Rod2, &Rod3);
-        else if (isKeyDown(SDLK_5))
-            discMove(&Rod3, &Rod1);
-        else if (isKeyDown(SDLK_6))
-            discMove(&Rod3, &Rod2);
-        else if (isKeyDown(SDLK_ESCAPE))
-            exit(1);
+        getkey();
+        indicator_position = keyDetect(indicator_position, &Rod1, &Rod2, &Rod3);
     }
     return 0;
 }
@@ -115,8 +106,10 @@ void discMove(Rod *a, Rod *b) {
     if (a->position != -1) {
         int disctopush = a->stack[a->position];
         if (b->stack[b->position] > disctopush || b->position == -1) {
-            int x1 = screenWidth() / 2 - rod_width, y1 = rod_height, x2 = x1 + 2 * rod_width, y2 = screenHeight();
-
+            int x1 = screenWidth() / 2 - rod_width,
+            y1 = rod_height,
+            x2 = x1 + 2 * rod_width,
+            y2 = screenHeight();
             //X axis animation
             do {
                 if (b->base_x1 + 10 * (DISCS - a->stack[a->position]) - disc_x1cords[DISCS - disctopush] > 0) {
@@ -175,6 +168,82 @@ void checkWin(Rod *goal) {
         SDL_Delay(1000);
         exit(1);
     }
+}
+
+void drawIndicator(int current_position, int xcord) {
+    switch (current_position) {
+        case 1:
+            filledCircle(xcord - displacement + rod_width, 50, 20, GREEN);
+            break;
+        case 2:
+            filledCircle(xcord + rod_width, 50, 20, GREEN);
+            break;
+        case 3:
+            filledCircle(xcord + displacement + rod_width, 50, 20, GREEN);
+            break;
+        default:
+            break;
+    }
+}
+
+int keyDetect(int indicator_position, Rod *Rod1, Rod *Rod2, Rod *Rod3) {
+    if (isKeyDown(SDLK_LEFT)) {
+        if (indicator_position == 1)
+            indicator_position = 3;
+        else
+            indicator_position--;
+    }
+    else if (isKeyDown(SDLK_RIGHT)) {
+        if (indicator_position == 3)
+            indicator_position = 1;
+        else
+            indicator_position++;
+    }
+    else if (isKeyDown(SDLK_1)) {
+        switch (indicator_position) {
+            case 1:
+                break;
+            case 2:
+                discMove(Rod2, Rod1);
+                break;
+            case 3:
+                discMove(Rod3, Rod1);
+                break;
+            default:
+                break;
+        }
+    }
+    else if (isKeyDown(SDLK_2)) {
+        switch (indicator_position) {
+            case 1:
+                discMove(Rod1, Rod2);
+                break;
+            case 2:
+                break;
+            case 3:
+                discMove(Rod3, Rod2);
+                break;
+            default:
+                break;
+        }
+    }
+    else if (isKeyDown(SDLK_3)) {
+        switch (indicator_position) {
+            case 1:
+                discMove(Rod1, Rod3);
+                break;
+            case 2:
+                discMove(Rod2, Rod3);
+                break;
+            case 3:
+                break;
+            default:
+                break;
+        }
+    }
+    else if (isKeyDown(SDLK_ESCAPE))
+        exit(1);
+    return indicator_position;
 }
 
 void testPrint(Rod *x, Rod *y, Rod *z) {
