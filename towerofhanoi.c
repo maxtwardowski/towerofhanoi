@@ -4,6 +4,10 @@
 
 #define FPS_RATE 60
 #define DISCS 3
+#define rod_width 17
+#define rod_height 170
+#define displacement 200
+#define blockwidth 70
 
 typedef struct Rod {
     int position;
@@ -17,8 +21,10 @@ typedef struct Rod {
 int disc_x1cords[DISCS], disc_y1cords[DISCS], disc_x2cords[DISCS], disc_y2cords[DISCS];
 
 void cleanScreen();
-void drawRods(int x1, int y1, int x2, int y2, int displacement);
+void drawRods(int xcord1, int ycord1, int xcord2, int ycord2, int disp);
 void discMove(Rod *a, Rod *b);
+void drawDiscs();
+void checkWin(Rod *goal);
 void testPrint(Rod *x, Rod *y, Rod *z);
 
 int main(int argc, char* argv[]) {
@@ -27,17 +33,13 @@ int main(int argc, char* argv[]) {
         exit(3);
     }
 
-    int x1, y1, x2, y2, rod_width = 17, rod_height = 170, displacement = 200, blockwidth = 70;
-
-    x1 = screenWidth() / 2 - rod_width;
-    y1 = rod_height;
-    x2 = x1 + 2 * rod_width;
-    y2 = screenHeight();
+    int x1 = screenWidth() / 2 - rod_width,
+        y1 = rod_height,
+        x2 = x1 + 2 * rod_width,
+        y2 = screenHeight();
 
     //Declaring the Rods
-    struct Rod Rod1;
-    struct Rod Rod2;
-    struct Rod Rod3;
+    struct Rod Rod1, Rod2, Rod3;
 
     for(int i = 0; i < DISCS; i++) {
         Rod1.stack[i] = DISCS - i;
@@ -69,34 +71,16 @@ int main(int argc, char* argv[]) {
         disc_y1cords[i] = screenHeight() - 25 * (Rod1.stack[DISCS - i - 1] - 1);
         disc_x2cords[i] = x2 - displacement + blockwidth - 10 * (Rod1.stack[DISCS - i - 1] - 1);
         disc_y2cords[i] = screenHeight() - 20 - 25 * (Rod1.stack[DISCS - i - 1] - 1);
-        printf("%d, %d, %d, %d\n", disc_x1cords[i], disc_y1cords[i], disc_x2cords[i], disc_y2cords[i]);
     }
 
     while(1) {
-
-        testPrint(&Rod1, &Rod2, &Rod3);
+        //testPrint(&Rod1, &Rod2, &Rod3);
         cleanScreen();
         drawRods(x1, y1, x2, y2, displacement);
-
-        for (int i = 0; i < DISCS; i++) {
-            filledRect(
-                disc_x1cords[i],
-                disc_y1cords[i],
-                disc_x2cords[i],
-                disc_y2cords[i],
-                RED
-            );
-        }
-
+        drawDiscs();
         updateScreen(); //Refreshing the screen
         SDL_Delay(1000 / FPS_RATE); //Setting FPS cap
-
-        if (Rod3.position == DISCS - 1) {
-            textout(screenWidth() / 2, screenHeight() / 2, "Y", GREEN);
-            updateScreen();
-            SDL_Delay(1000);
-            exit(1);
-        }
+        checkWin(&Rod3);
 
         if (isKeyDown(SDLK_1))
             discMove(&Rod1, &Rod2);
@@ -112,9 +96,6 @@ int main(int argc, char* argv[]) {
             discMove(&Rod3, &Rod2);
         else if (isKeyDown(SDLK_ESCAPE))
             exit(1);
-
-
-        //End of the main loop
     }
     return 0;
 }
@@ -123,10 +104,10 @@ void cleanScreen() {
 	filledRect(0, 0, screenWidth(), screenHeight(), BLACK);
 }
 
-void drawRods(int x1, int y1, int x2, int y2, int displacement) {
-    filledRect(x1, y1, x2, y2, WHITE);
-    filledRect(x1 - displacement, y1, x2 - displacement, y2, WHITE);
-    filledRect(x1 + displacement, y1, x2 + displacement, y2, WHITE);
+void drawRods(int xcord1, int ycord1, int xcord2, int ycord2, int disp) {
+    filledRect(xcord1, ycord1, xcord2, ycord2, WHITE);
+    filledRect(xcord1 - displacement, ycord1, xcord2 - disp, ycord2, WHITE);
+    filledRect(xcord1 + displacement, ycord1, xcord2 + disp, ycord2, WHITE);
 }
 
 void discMove(Rod *a, Rod *b) {
@@ -134,17 +115,65 @@ void discMove(Rod *a, Rod *b) {
     if (a->position != -1) {
         int disctopush = a->stack[a->position];
         if (b->stack[b->position] > disctopush || b->position == -1) {
+            int x1 = screenWidth() / 2 - rod_width, y1 = rod_height, x2 = x1 + 2 * rod_width, y2 = screenHeight();
 
-            disc_x1cords[DISCS - disctopush] = b->base_x1 + 10 * (DISCS - a->stack[a->position]);
-            disc_y1cords[DISCS - disctopush] = b->base_y1 - 25 * (b->position + 1);
-            disc_x2cords[DISCS - disctopush] = b->base_x2 - 10 * (DISCS - a->stack[a->position]);
-            disc_y2cords[DISCS - disctopush] = b->base_y2 - 25 * (b->position + 1);
+            //X axis animation
+            do {
+                if (b->base_x1 + 10 * (DISCS - a->stack[a->position]) - disc_x1cords[DISCS - disctopush] > 0) {
+                    disc_x1cords[DISCS - disctopush]++;
+                    disc_x2cords[DISCS - disctopush]++;
+                } else {
+                    disc_x1cords[DISCS - disctopush]--;
+                    disc_x2cords[DISCS - disctopush]--;
+                }
+                cleanScreen();
+                drawRods(x1, y1, x2, y2, displacement);
+                drawDiscs();
+                updateScreen();
+                SDL_Delay(1000 / 900);
+            } while (disc_x1cords[DISCS - disctopush] != b->base_x1 + 10 * (DISCS - a->stack[a->position]));
+
+            //Y axis animation
+            do {
+                if (b->base_y1 - 25 * (b->position + 1) - disc_y1cords[DISCS - disctopush] > 0) {
+                    disc_y1cords[DISCS - disctopush]++;
+                    disc_y2cords[DISCS - disctopush]++;
+                } else {
+                    disc_y1cords[DISCS - disctopush]--;
+                    disc_y2cords[DISCS - disctopush]--;
+                }
+                cleanScreen();
+                drawRods(x1, y1, x2, y2, displacement);
+                drawDiscs();
+                updateScreen();
+                SDL_Delay(1000 / FPS_RATE);
+            } while (disc_y1cords[DISCS - disctopush] != b->base_y1 - 25 * (b->position + 1));
 
             a->stack[a->position] = 0;
             a->position = a->position - 1;
             b->position = b->position + 1;
             b->stack[b->position] = disctopush;
         }
+    }
+}
+
+void drawDiscs() {
+    for (int i = 0; i < DISCS; i++) {
+        filledRect(
+            disc_x1cords[i],
+            disc_y1cords[i],
+            disc_x2cords[i],
+            disc_y2cords[i],
+            RED
+        );
+    }
+}
+
+void checkWin(Rod *goal) {
+    if (goal->position == DISCS - 1) {
+        updateScreen();
+        SDL_Delay(1000);
+        exit(1);
     }
 }
 
