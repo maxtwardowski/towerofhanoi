@@ -4,7 +4,7 @@ towerofhanoi: towerofhanoi.o primlib.o
 	gcc -g $^ -o $@ -lm -lSDL -lpthread -lSDL_gfx
 
 .c.o:
-	gcc -g -Wall -pedantic -Werror -std=c99 -c -D_REENTRANT $<
+	gcc -g -std=c99 -c -D_REENTRANT $<
 
 primlib.o: primlib.c primlib.h
 
