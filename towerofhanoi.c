@@ -3,8 +3,8 @@
 #include <math.h>
 
 #define FPS_RATE 60
-#define DISCS 3
-#define PEGS 3
+#define DISCS 6
+#define PEGS 2
 
 int gameboard[DISCS][PEGS];
 int stack_info[PEGS];
@@ -108,7 +108,11 @@ void drawDiscs() {
         x2 += x2_base;
         y2 = y2_base;
         for (int j = 0; j <= stack_info[i]; j++) {
-            filledRect(x1 - disc_width, y1, x2 + disc_width, y2, RED);
+            filledRect(x1 - disc_width * gameboard[j][i] / DISCS,
+                       y1,
+                       x2 + disc_width * gameboard[j][i] / DISCS,
+                       y2,
+                       RED);
             y1 -= disc_height;
             y2 -= disc_height;
         }
@@ -140,7 +144,8 @@ void keyDetect(int key1) {
         key2 -= 49;
     }
 
-    moveDisc(key1, key2);
+    if (key1 < PEGS && key2 < PEGS) //Protection against moving disc to an unexisting peg
+        moveDisc(key1, key2);
 }
 
 void checkWin() {
