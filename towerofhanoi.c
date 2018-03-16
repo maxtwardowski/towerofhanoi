@@ -5,9 +5,9 @@
 #define FPS_RATE 60
 #define DISCS 3
 #define PEGS 3
-#define DISC_WIDTH 70
+#define DISC_WIDTH 80
 #define DISC_HEIGHT 20
-#define PEG_WIDTH 10
+#define PEG_WIDTH 15
 #define PEG_HEIGHT 170
 
 int gameboard[DISCS][PEGS];
@@ -20,7 +20,7 @@ void drawPegs(int pegs_number);
 void drawDiscs();
 void drawDiscMoveAnimation(int peg_from, int peg_to, int disctopush);
 void moveDisc(int peg_from, int peg_to);
-void keyDetect(int key1);
+void keyDetect();
 void checkWin();
 void testPrint_gameboard();
 void testPrint_stack();
@@ -40,14 +40,7 @@ int main(int argc, char* argv[]) {
         drawDiscs();
         updateScreen();
         checkWin();
-
-        testPrint_gameboard();
-        testPrint_stack();
-        //printf("%d\n", getkey());
-
-        int keyinput1 = getkey();
-        if (keyinput1)
-            keyDetect(keyinput1);
+        keyDetect();
 
         if (isKeyDown(SDLK_ESCAPE))
             exit(1);
@@ -81,16 +74,18 @@ void cleanScreen() {
 }
 
 void drawPegs(int pegs_number) {
-    int x1 = 0, x2 = 0;
-    int x1_base = screenWidth() / (pegs_number + 1),
+    int x1 = 0,
+        x2 = 0,
+        x1_base = screenWidth() / (pegs_number + 1),
         y1_base = PEG_HEIGHT,
         x2_base = screenWidth() / (pegs_number + 1),
-        y2_base = screenHeight();
+        y2_base = screenHeight(),
+        peg_width = PEG_WIDTH * (11 - PEGS) / 10;
 
     for (int i = 0; i < pegs_number; i++) {
         x1 += x1_base;
         x2 += x2_base;
-        filledRect(x1 - PEG_WIDTH, y1_base, x2 + PEG_WIDTH, y2_base, WHITE);
+        filledRect(x1 - peg_width, y1_base, x2 + peg_width, y2_base, WHITE);
     }
 }
 
@@ -99,7 +94,7 @@ void drawDiscs() {
     int x1_base = screenWidth() / (PEGS + 1),
         y1_base = screenHeight(),
         x2_base = screenWidth() / (PEGS + 1),
-        y2_base = screenHeight() - DISC_HEIGHT;
+        y2_base = screenHeight() - DISC_HEIGHT * (50 - DISCS ) / 50;
 
     int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
 
@@ -114,8 +109,8 @@ void drawDiscs() {
                        x2 + DISC_WIDTH * gameboard[j][i] / DISCS,
                        y2,
                        RED);
-            y1 -= DISC_HEIGHT;
-            y2 -= DISC_HEIGHT;
+            y1 -= DISC_HEIGHT * (50 - DISCS) / 50;
+            y2 -= DISC_HEIGHT * (50 - DISCS) / 50;
         }
     }
 }
@@ -124,16 +119,16 @@ void drawDiscMoveAnimation(int peg_from, int peg_to, int disctopush) {
     int x1_base = screenWidth() / (PEGS + 1),
         y1_base = screenHeight(),
         x2_base = screenWidth() / (PEGS + 1),
-        y2_base = screenHeight() - DISC_HEIGHT;
+        y2_base = screenHeight() - DISC_HEIGHT * (50 - DISCS) / 50;
 
     int x1_from = x1_base * (peg_from + 1) - DISC_WIDTH * disctopush / DISCS,
-        y1_from = y1_base - DISC_HEIGHT * (stack_info[peg_from] + 1),
+        y1_from = y1_base - DISC_HEIGHT * (stack_info[peg_from] + 1) * (50 - DISCS) / 50,
         x2_from = x2_base * (peg_from + 1) + DISC_WIDTH * disctopush / DISCS,
-        y2_from = y2_base - DISC_HEIGHT * (stack_info[peg_from] + 1),
+        y2_from = y2_base - DISC_HEIGHT * (stack_info[peg_from] + 1) * (50 - DISCS) / 50,
         x1_to = x1_base * (peg_to + 1) - DISC_WIDTH * disctopush / DISCS,
-        y1_to = y1_base - DISC_HEIGHT * (stack_info[peg_to] + 1),
+        y1_to = y1_base - DISC_HEIGHT * (stack_info[peg_to] + 1) * (50 - DISCS) / 50,
         x2_to = x1_base * (peg_to + 1) - DISC_WIDTH * disctopush / DISCS,
-        y2_to = y2_base - DISC_HEIGHT * (stack_info[peg_to] + 1);
+        y2_to = y2_base - DISC_HEIGHT * (stack_info[peg_to] + 1) * (50 - DISCS) / 50;
 
     do {
         cleanScreen();
@@ -186,21 +181,25 @@ void moveDisc(int peg_from, int peg_to) {
     }
 }
 
-void keyDetect(int key1) {
-    int action1, action2;
-    int key2 = getkey();
+void keyDetect() {
+    int key1 = getkey();
 
     if (key1 == 48)
         key1 = 9;
-    else if (key2 == 48)
-        key2 = 9;
-    else {
+    else
         key1 -= 49;
-        key2 -= 49;
-    }
 
-    if (key1 < PEGS && key2 < PEGS) //Protection against moving disc to an unexisting peg
-        moveDisc(key1, key2);
+    //Not allowing the secong key if impossible action triggered
+    //so that no unnecessary read-outs occur
+    if (stack_info[key1] != -1 && key1 < PEGS) {
+        int key2 = getkey();
+        if (key2 == 48)
+            key2 = 9;
+        else
+            key2 -= 49;
+        if (key1 < PEGS && key2 < PEGS) //Protection against moving disc to an unexisting peg
+            moveDisc(key1, key2);
+    }
 }
 
 void checkWin() {
