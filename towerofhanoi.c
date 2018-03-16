@@ -2,11 +2,9 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define SCREEN_WIDTH 1000
-#define SCREEN_HEIGHT 500
 #define FPS_RATE 700
-#define DISCS 50
-#define PEGS 10
+#define DISCS 3
+#define PEGS 3
 #define DISC_WIDTH 80
 #define DISC_HEIGHT 20
 #define PEG_WIDTH 15
@@ -34,7 +32,7 @@ int main(int argc, char* argv[]) {
     setDefault_gameboard();
     setDefault_stack();
 
-    if(initGraph(SCREEN_WIDTH, SCREEN_HEIGHT)) {
+    if(initGraph()) {
         exit(3);
     }
 
@@ -45,9 +43,6 @@ int main(int argc, char* argv[]) {
         updateScreen();
         checkWin();
         keyDetect();
-
-        if (isKeyDown(SDLK_ESCAPE))
-            exit(1);
     }
 
     return 0;
@@ -131,9 +126,7 @@ void drawDiscMoveAnimation(int peg_from, int peg_to, int disctopush) {
         x2_from = x2_base * (peg_from + 1) + DISC_WIDTH * disctopush / DISCS,
         y2_from = y2_base - heightstep * (stack_info[peg_from] + 1),
         x1_to = x1_base * (peg_to + 1) - DISC_WIDTH * disctopush / DISCS,
-        y1_to = y1_base - heightstep * (stack_info[peg_to] + 1),
-        x2_to = x1_base * (peg_to + 1) - DISC_WIDTH * disctopush / DISCS,
-        y2_to = y2_base - heightstep * (stack_info[peg_to] + 1);
+        y1_to = y1_base - heightstep * (stack_info[peg_to] + 1);
 
     do {
         cleanScreen();
@@ -176,6 +169,9 @@ void drawDiscMoveAnimation(int peg_from, int peg_to, int disctopush) {
 void moveDisc(int peg_from, int peg_to) {
     if (stack_info[peg_from] != -1) {
         int disctopush = gameboard[stack_info[peg_from]][peg_from];
+        printf("===========\n");
+        printf("Disc to push: %d\n", disctopush);
+        printf("===========\n");
         if (stack_info[peg_to] == -1 || gameboard[stack_info[peg_to]][peg_to] > disctopush) {
             gameboard[stack_info[peg_from]][peg_from] = 0; //Indicating empty stack slot
             stack_info[peg_from]--; //Decreasing the origin stack index
@@ -188,21 +184,26 @@ void moveDisc(int peg_from, int peg_to) {
 
 void keyDetect() {
     int key1 = getkey();
-    if (key1 == 48)
-        key1 = 9;
-    else
-        key1 -= 49; //Subtracting 49 to 'convert' the keycode to its actual value (0 acts like 10 though)
-
-    //Not allowing the secong key if impossible action triggered
-    //so that no unnecessary read-outs occur
-    if (stack_info[key1] != -1 && key1 < PEGS) {
-        int key2 = getkey();
-        if (key2 == 48)
-            key2 = 9;
+    //Preventing memory errors caused by assigning SDLK_ESCAPE code to the disctopush
+    if (key1 == 27)
+        exit(1);
+    else {
+        if (key1 == 48)
+            key1 = 9;
         else
-            key2 -= 49;
-        if (key1 < PEGS && key2 < PEGS) //Protection against moving disc to an unexisting peg
-            moveDisc(key1, key2);
+            key1 -= 49; //Subtracting 49 to 'convert' the keycode to its actual value (0 acts like 10 though)
+
+        //Not allowing the secong key if impossible action triggered
+        //so that no unnecessary read-outs occur
+        if (stack_info[key1] != -1 && key1 < PEGS) {
+            int key2 = getkey();
+            if (key2 == 48)
+                key2 = 9;
+            else
+                key2 -= 49;
+            if (key1 < PEGS && key2 < PEGS) //Protection against moving disc to an unexisting peg
+                moveDisc(key1, key2);
+        }
     }
 }
 

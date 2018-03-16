@@ -13,7 +13,7 @@
 
 
 static SDL_Surface *screen;
-static Uint32 colors[COLOR_MAX] = {0x000000ff,
+static Uint32 colors[COLOR_MAX] = {0x000000ff, 
                                0xff0000ff, 0x00ff00ff, 0x0000ffff,
                                0x00ffffff, 0xff00ffff, 0xffff00ff,
                                0xffffffff};
@@ -78,12 +78,12 @@ void textout(int x, int y, char *s, enum color c)
 {
 	assert(c<COLOR_MAX);
 	stringColor(screen, x, y, s, colors[c]);
-}
+} 
 
 int pollkey()
 {
 	SDL_Event event;
-	while ( SDL_PollEvent(&event) )
+	while ( SDL_PollEvent(&event) ) 
 	{
 		switch (event.type) {
 			case SDL_KEYDOWN:
@@ -114,18 +114,17 @@ int isKeyDown(int key)
  Uint8* keytable;
  int numkeys;
  SDL_PumpEvents();
-
  keytable=SDL_GetKeyState(&numkeys);
  assert(key<numkeys);
  return keytable[key];
 }
 
-int initGraph(int screenwidth, int screenheight)
+int initGraph()
 {
 	const SDL_VideoInfo *info;
 	Uint8  video_bpp;
 	Uint32 videoflags;
-
+        
         if(screen)
         {
 		fprintf(stderr,"initGraph called twice\n");
@@ -146,10 +145,10 @@ int initGraph(int screenwidth, int screenheight)
 		video_bpp = 16;
 	}
 	videoflags = SDL_SWSURFACE | SDL_DOUBLEBUF;
-
+	
 	/* Set 640x480 video mode */
-	if ( (screen=SDL_SetVideoMode(screenwidth,screenheight,video_bpp,videoflags)) == NULL ) {
-		fprintf(stderr, "Couldn't set %ix%i video mode: %s\n",screenwidth,screenheight,SDL_GetError());
+	if ( (screen=SDL_SetVideoMode(640,480,video_bpp,videoflags)) == NULL ) {
+		fprintf(stderr, "Couldn't set %ix%i video mode: %s\n",640,480,SDL_GetError());
 		return 2;
 	}
     return 0;

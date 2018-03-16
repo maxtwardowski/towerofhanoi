@@ -1,10 +1,10 @@
 all: towerofhanoi
 
 towerofhanoi: towerofhanoi.o primlib.o
-	gcc -g $^ -o $@ -lm -lSDL -lpthread -lSDL_gfx
+	gcc -fsanitize=address -g $^ -o $@ -lm -lSDL -lpthread -lSDL_gfx
 
 .c.o:
-	gcc -g -std=c99 -c -D_REENTRANT $<
+	gcc -fsanitize=address -g -Wall -pedantic -Werror -std=c99 -c -D_REENTRANT $<
 
 primlib.o: primlib.c primlib.h
 
@@ -14,3 +14,4 @@ clean:
 	-rm primlib.o towerofhanoi.o towerofhanoi
 
 # -Wall -pedantic -Werror
+# -fsanitize=address
