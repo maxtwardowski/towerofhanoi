@@ -2,13 +2,17 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define FPS_RATE 60
-#define DISCS 3
-#define PEGS 3
+#define SCREEN_WIDTH 1000
+#define SCREEN_HEIGHT 500
+#define FPS_RATE 700
+#define DISCS 50
+#define PEGS 10
 #define DISC_WIDTH 80
 #define DISC_HEIGHT 20
 #define PEG_WIDTH 15
 #define PEG_HEIGHT 170
+#define PEG_HEIGHT_THRESHOLD 99
+#define DISC_THRESHOLD 51
 
 int gameboard[DISCS][PEGS];
 int stack_info[PEGS];
@@ -30,7 +34,7 @@ int main(int argc, char* argv[]) {
     setDefault_gameboard();
     setDefault_stack();
 
-    if(initGraph()) {
+    if(initGraph(SCREEN_WIDTH, SCREEN_HEIGHT)) {
         exit(3);
     }
 
@@ -77,10 +81,10 @@ void drawPegs(int pegs_number) {
     int x1 = 0,
         x2 = 0,
         x1_base = screenWidth() / (pegs_number + 1),
-        y1_base = PEG_HEIGHT,
+        y1_base = screenHeight() - DISC_HEIGHT * (PEG_HEIGHT_THRESHOLD - DISCS) / PEG_HEIGHT_THRESHOLD * (DISCS + 1),
         x2_base = screenWidth() / (pegs_number + 1),
         y2_base = screenHeight(),
-        peg_width = PEG_WIDTH * (11 - PEGS) / 10;
+        peg_width = DISC_WIDTH / DISCS;
 
     for (int i = 0; i < pegs_number; i++) {
         x1 += x1_base;
@@ -94,7 +98,7 @@ void drawDiscs() {
     int x1_base = screenWidth() / (PEGS + 1),
         y1_base = screenHeight(),
         x2_base = screenWidth() / (PEGS + 1),
-        y2_base = screenHeight() - DISC_HEIGHT * (50 - DISCS ) / 50;
+        y2_base = screenHeight() - DISC_HEIGHT * (PEG_HEIGHT_THRESHOLD - DISCS) / PEG_HEIGHT_THRESHOLD;
 
     int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
 
@@ -109,26 +113,27 @@ void drawDiscs() {
                        x2 + DISC_WIDTH * gameboard[j][i] / DISCS,
                        y2,
                        RED);
-            y1 -= DISC_HEIGHT * (50 - DISCS) / 50;
-            y2 -= DISC_HEIGHT * (50 - DISCS) / 50;
+            y1 -= DISC_HEIGHT * (PEG_HEIGHT_THRESHOLD - DISCS) / PEG_HEIGHT_THRESHOLD;
+            y2 -= DISC_HEIGHT * (PEG_HEIGHT_THRESHOLD - DISCS) / PEG_HEIGHT_THRESHOLD;
         }
     }
 }
 
 void drawDiscMoveAnimation(int peg_from, int peg_to, int disctopush) {
-    int x1_base = screenWidth() / (PEGS + 1),
+    int heightstep = DISC_HEIGHT * (PEG_HEIGHT_THRESHOLD - DISCS) / PEG_HEIGHT_THRESHOLD,
+        x1_base = screenWidth() / (PEGS + 1),
         y1_base = screenHeight(),
         x2_base = screenWidth() / (PEGS + 1),
-        y2_base = screenHeight() - DISC_HEIGHT * (50 - DISCS) / 50;
+        y2_base = screenHeight() - heightstep;
 
     int x1_from = x1_base * (peg_from + 1) - DISC_WIDTH * disctopush / DISCS,
-        y1_from = y1_base - DISC_HEIGHT * (stack_info[peg_from] + 1) * (50 - DISCS) / 50,
+        y1_from = y1_base - heightstep * (stack_info[peg_from] + 1),
         x2_from = x2_base * (peg_from + 1) + DISC_WIDTH * disctopush / DISCS,
-        y2_from = y2_base - DISC_HEIGHT * (stack_info[peg_from] + 1) * (50 - DISCS) / 50,
+        y2_from = y2_base - heightstep * (stack_info[peg_from] + 1),
         x1_to = x1_base * (peg_to + 1) - DISC_WIDTH * disctopush / DISCS,
-        y1_to = y1_base - DISC_HEIGHT * (stack_info[peg_to] + 1) * (50 - DISCS) / 50,
+        y1_to = y1_base - heightstep * (stack_info[peg_to] + 1),
         x2_to = x1_base * (peg_to + 1) - DISC_WIDTH * disctopush / DISCS,
-        y2_to = y2_base - DISC_HEIGHT * (stack_info[peg_to] + 1) * (50 - DISCS) / 50;
+        y2_to = y2_base - heightstep * (stack_info[peg_to] + 1);
 
     do {
         cleanScreen();
@@ -147,7 +152,7 @@ void drawDiscMoveAnimation(int peg_from, int peg_to, int disctopush) {
             filledRect(x1_from, y1_from, x2_from, y2_from, RED);
         }
         updateScreen();
-        SDL_Delay(1000 / 600);
+        SDL_Delay(1000 / FPS_RATE);
     } while (x1_from != x1_to);
 
     do {
@@ -163,7 +168,7 @@ void drawDiscMoveAnimation(int peg_from, int peg_to, int disctopush) {
             filledRect(x1_from, y1_from, x2_from, y2_from, RED);
         }
         updateScreen();
-        SDL_Delay(1000 / 60);
+        SDL_Delay(1000 / FPS_RATE);
     } while (y1_from != y1_to);
 
 }
@@ -183,11 +188,10 @@ void moveDisc(int peg_from, int peg_to) {
 
 void keyDetect() {
     int key1 = getkey();
-
     if (key1 == 48)
         key1 = 9;
     else
-        key1 -= 49;
+        key1 -= 49; //Subtracting 49 to 'convert' the keycode to its actual value (0 acts like 10 though)
 
     //Not allowing the secong key if impossible action triggered
     //so that no unnecessary read-outs occur

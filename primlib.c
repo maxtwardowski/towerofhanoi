@@ -120,7 +120,7 @@ int isKeyDown(int key)
  return keytable[key];
 }
 
-int initGraph()
+int initGraph(int screenwidth, int screenheight)
 {
 	const SDL_VideoInfo *info;
 	Uint8  video_bpp;
@@ -148,8 +148,8 @@ int initGraph()
 	videoflags = SDL_SWSURFACE | SDL_DOUBLEBUF;
 
 	/* Set 640x480 video mode */
-	if ( (screen=SDL_SetVideoMode(640,480,video_bpp,videoflags)) == NULL ) {
-		fprintf(stderr, "Couldn't set %ix%i video mode: %s\n",640,480,SDL_GetError());
+	if ( (screen=SDL_SetVideoMode(screenwidth,screenheight,video_bpp,videoflags)) == NULL ) {
+		fprintf(stderr, "Couldn't set %ix%i video mode: %s\n",screenwidth,screenheight,SDL_GetError());
 		return 2;
 	}
     return 0;
