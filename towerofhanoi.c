@@ -3,8 +3,12 @@
 #include <math.h>
 
 #define FPS_RATE 60
-#define DISCS 6
-#define PEGS 2
+#define DISCS 3
+#define PEGS 3
+#define DISC_WIDTH 70
+#define DISC_HEIGHT 20
+#define PEG_WIDTH 10
+#define PEG_HEIGHT 170
 
 int gameboard[DISCS][PEGS];
 int stack_info[PEGS];
@@ -14,6 +18,7 @@ void setDefault_stack();
 void cleanScreen();
 void drawPegs(int pegs_number);
 void drawDiscs();
+void drawDiscMoveAnimation(int peg_from, int peg_to, int disctopush);
 void moveDisc(int peg_from, int peg_to);
 void keyDetect(int key1);
 void checkWin();
@@ -76,29 +81,25 @@ void cleanScreen() {
 }
 
 void drawPegs(int pegs_number) {
-    int x1 = 0, x2 = 0, peg_width = 10, peg_height = 170;
-
+    int x1 = 0, x2 = 0;
     int x1_base = screenWidth() / (pegs_number + 1),
-        y1_base = peg_height,
+        y1_base = PEG_HEIGHT,
         x2_base = screenWidth() / (pegs_number + 1),
         y2_base = screenHeight();
 
     for (int i = 0; i < pegs_number; i++) {
         x1 += x1_base;
         x2 += x2_base;
-        filledRect(x1 - peg_width, y1_base, x2 + peg_width, y2_base, WHITE);
+        filledRect(x1 - PEG_WIDTH, y1_base, x2 + PEG_WIDTH, y2_base, WHITE);
     }
 }
 
-
-//remove duplicate variables
+//LATER: remove duplicate variables
 void drawDiscs() {
-    int disc_width = 70, disc_height = 20;
-
     int x1_base = screenWidth() / (PEGS + 1),
         y1_base = screenHeight(),
         x2_base = screenWidth() / (PEGS + 1),
-        y2_base = screenHeight() - disc_height;
+        y2_base = screenHeight() - DISC_HEIGHT;
 
     int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
 
@@ -108,15 +109,68 @@ void drawDiscs() {
         x2 += x2_base;
         y2 = y2_base;
         for (int j = 0; j <= stack_info[i]; j++) {
-            filledRect(x1 - disc_width * gameboard[j][i] / DISCS,
+            filledRect(x1 - DISC_WIDTH * gameboard[j][i] / DISCS,
                        y1,
-                       x2 + disc_width * gameboard[j][i] / DISCS,
+                       x2 + DISC_WIDTH * gameboard[j][i] / DISCS,
                        y2,
                        RED);
-            y1 -= disc_height;
-            y2 -= disc_height;
+            y1 -= DISC_HEIGHT;
+            y2 -= DISC_HEIGHT;
         }
     }
+}
+
+void drawDiscMoveAnimation(int peg_from, int peg_to, int disctopush) {
+    int x1_base = screenWidth() / (PEGS + 1),
+        y1_base = screenHeight(),
+        x2_base = screenWidth() / (PEGS + 1),
+        y2_base = screenHeight() - DISC_HEIGHT;
+
+    int x1_from = x1_base * (peg_from + 1) - DISC_WIDTH * disctopush / DISCS,
+        y1_from = y1_base - DISC_HEIGHT * (stack_info[peg_from] + 1),
+        x2_from = x2_base * (peg_from + 1) + DISC_WIDTH * disctopush / DISCS,
+        y2_from = y2_base - DISC_HEIGHT * (stack_info[peg_from] + 1),
+        x1_to = x1_base * (peg_to + 1) - DISC_WIDTH * disctopush / DISCS,
+        y1_to = y1_base - DISC_HEIGHT * (stack_info[peg_to] + 1),
+        x2_to = x1_base * (peg_to + 1) - DISC_WIDTH * disctopush / DISCS,
+        y2_to = y2_base - DISC_HEIGHT * (stack_info[peg_to] + 1);
+
+    do {
+        cleanScreen();
+        drawPegs(PEGS);
+        drawDiscs();
+        if (x1_from < x1_to) {
+            x1_from++, x2_from++;
+            filledRect(x1_from,
+                       y1_from,
+                       x2_from,
+                       y2_from,
+                       RED);
+        }
+        else {
+            x1_from--, x2_from--;
+            filledRect(x1_from, y1_from, x2_from, y2_from, RED);
+        }
+        updateScreen();
+        SDL_Delay(1000 / 600);
+    } while (x1_from != x1_to);
+
+    do {
+        cleanScreen();
+        drawPegs(PEGS);
+        drawDiscs();
+        if (y1_from < y1_to) {
+            y1_from++, y2_from++;
+            filledRect(x1_from, y1_from, x2_from, y2_from, RED);
+        }
+        else {
+            y1_from--, y2_from--;
+            filledRect(x1_from, y1_from, x2_from, y2_from, RED);
+        }
+        updateScreen();
+        SDL_Delay(1000 / 60);
+    } while (y1_from != y1_to);
+
 }
 
 void moveDisc(int peg_from, int peg_to) {
@@ -125,6 +179,7 @@ void moveDisc(int peg_from, int peg_to) {
         if (stack_info[peg_to] == -1 || gameboard[stack_info[peg_to]][peg_to] > disctopush) {
             gameboard[stack_info[peg_from]][peg_from] = 0; //Indicating empty stack slot
             stack_info[peg_from]--; //Decreasing the origin stack index
+            drawDiscMoveAnimation(peg_from, peg_to, disctopush);
             stack_info[peg_to]++; //Increasing the destination stack index
             gameboard[stack_info[peg_to]][peg_to] = disctopush;
         }
