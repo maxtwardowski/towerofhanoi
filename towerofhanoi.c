@@ -103,9 +103,9 @@ void drawDiscs() {
         x2 += x2_base;
         y2 = y2_base;
         for (int j = 0; j <= stack_info[i]; j++) {
-            filledRect(x1 - DISC_WIDTH * gameboard[j][i] / DISCS,
+            filledRect(x1 - x1_base / 2 * gameboard[j][i] / DISCS,
                        y1,
-                       x2 + DISC_WIDTH * gameboard[j][i] / DISCS,
+                       x2 + x1_base / 2 * gameboard[j][i] / DISCS,
                        y2,
                        RED);
             y1 -= DISC_HEIGHT * (PEG_HEIGHT_THRESHOLD - DISCS) / PEG_HEIGHT_THRESHOLD;
@@ -169,9 +169,7 @@ void drawDiscMoveAnimation(int peg_from, int peg_to, int disctopush) {
 void moveDisc(int peg_from, int peg_to) {
     if (stack_info[peg_from] != -1) {
         int disctopush = gameboard[stack_info[peg_from]][peg_from];
-        printf("===========\n");
-        printf("Disc to push: %d\n", disctopush);
-        printf("===========\n");
+
         if (stack_info[peg_to] == -1 || gameboard[stack_info[peg_to]][peg_to] > disctopush) {
             gameboard[stack_info[peg_from]][peg_from] = 0; //Indicating empty stack slot
             stack_info[peg_from]--; //Decreasing the origin stack index
