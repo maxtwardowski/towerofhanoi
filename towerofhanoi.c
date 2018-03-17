@@ -3,7 +3,7 @@
 #include <math.h>
 
 #define DISCS 50
-#define PEGS 3
+#define PEGS 10
 #define FPS_RATE 700
 #define DISC_HEIGHT 20
 #define PEG_HEIGHT_THRESHOLD 99
@@ -129,6 +129,22 @@ void drawDiscMoveAnimation(int peg_from, int peg_to, int disctopush) {
         x1_to = x1_base * (peg_to + 1) - x1_base / 2 * disctopush / DISCS,
         y1_to = y1_base - heightstep * (stack_info[peg_to] + 1);
 
+
+    do {
+        cleanScreen();
+        drawPegs(PEGS);
+        drawDiscs();
+        y1_from--, y2_from--;
+        filledRect(x1_from,
+                   y1_from,
+                   x2_from,
+                   y2_from,
+                   RED);
+        updateScreen();
+        SDL_Delay(1000 / FPS_RATE);
+    } while (y1_from != screenHeight() - DISC_HEIGHT * (PEG_HEIGHT_THRESHOLD - DISCS) / PEG_HEIGHT_THRESHOLD * (DISCS + 2));
+
+
     //Simulating X axis animation
     do {
         cleanScreen();
@@ -149,6 +165,7 @@ void drawDiscMoveAnimation(int peg_from, int peg_to, int disctopush) {
         updateScreen();
         SDL_Delay(1000 / FPS_RATE);
     } while (x1_from != x1_to);
+
 
     //Simulating Y axis animation
     do {
