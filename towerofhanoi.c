@@ -4,9 +4,7 @@
 
 #define DISCS 3
 #define PEGS 3
-#define FPS_RATE 700
-#define DISC_HEIGHT 20
-#define PEG_HEIGHT_THRESHOLD 99
+#define DELAY 800
 
 int gameboard[DISCS][PEGS];
 int stack_info[PEGS];
@@ -73,10 +71,12 @@ void cleanScreen() {
 
 void drawPegs(int pegs_number) {
     //Draws the given number of pegs
-    int x1 = 0,
+    int base_disc_height = 20,
+        peg_height_threshold = 99,
+        x1 = 0,
         x2 = 0,
         x1_base = screenWidth() / (pegs_number + 1),
-        y1_base = screenHeight() - DISC_HEIGHT * (PEG_HEIGHT_THRESHOLD - DISCS) / PEG_HEIGHT_THRESHOLD * (DISCS + 1),
+        y1_base = screenHeight() - base_disc_height * (peg_height_threshold - DISCS) / peg_height_threshold * (DISCS + 1),
         x2_base = screenWidth() / (pegs_number + 1),
         y2_base = screenHeight(),
         peg_width = x1_base / 2 / DISCS;
@@ -90,10 +90,12 @@ void drawPegs(int pegs_number) {
 
 void drawDiscs() {
     //Draws discs on the pegs according to the gameboard and stack_info data
-    int x1_base = screenWidth() / (PEGS + 1),
+    int peg_height_threshold = 99,
+        base_disc_height = 20,
+        x1_base = screenWidth() / (PEGS + 1),
         y1_base = screenHeight(),
         x2_base = x1_base,
-        y2_base = screenHeight() - DISC_HEIGHT * (PEG_HEIGHT_THRESHOLD - DISCS) / PEG_HEIGHT_THRESHOLD;
+        y2_base = screenHeight() - base_disc_height * (peg_height_threshold - DISCS) / peg_height_threshold;
 
     int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
 
@@ -108,15 +110,17 @@ void drawDiscs() {
                        x2 + x1_base / 2 * gameboard[j][i] / DISCS,
                        y2,
                        RED);
-            y1 -= DISC_HEIGHT * (PEG_HEIGHT_THRESHOLD - DISCS) / PEG_HEIGHT_THRESHOLD;
-            y2 -= DISC_HEIGHT * (PEG_HEIGHT_THRESHOLD - DISCS) / PEG_HEIGHT_THRESHOLD;
+            y1 -= base_disc_height * (peg_height_threshold - DISCS) / peg_height_threshold;
+            y2 -= base_disc_height * (peg_height_threshold - DISCS) / peg_height_threshold;
         }
     }
 }
 
 void drawDiscMoveAnimation(int peg_from, int peg_to, int disctopush) {
     //Animates the action of moving a disc from one peg to another
-    int heightstep = DISC_HEIGHT * (PEG_HEIGHT_THRESHOLD - DISCS) / PEG_HEIGHT_THRESHOLD,
+    int peg_height_threshold = 99,
+        base_disc_height = 20,
+        heightstep = base_disc_height * (peg_height_threshold - DISCS) / peg_height_threshold,
         x1_base = screenWidth() / (PEGS + 1),
         y1_base = screenHeight(),
         x2_base = screenWidth() / (PEGS + 1),
@@ -141,8 +145,8 @@ void drawDiscMoveAnimation(int peg_from, int peg_to, int disctopush) {
                    y2_from,
                    RED);
         updateScreen();
-        SDL_Delay(1000 / FPS_RATE);
-    } while (y1_from != screenHeight() - DISC_HEIGHT * (PEG_HEIGHT_THRESHOLD - DISCS) / PEG_HEIGHT_THRESHOLD * (DISCS + 2));
+        SDL_Delay(1000 / DELAY);
+    } while (y1_from != screenHeight() - base_disc_height * (peg_height_threshold - DISCS) / peg_height_threshold * (DISCS + 2));
 
 
     //Simulating X axis animation
@@ -163,7 +167,7 @@ void drawDiscMoveAnimation(int peg_from, int peg_to, int disctopush) {
             filledRect(x1_from, y1_from, x2_from, y2_from, RED);
         }
         updateScreen();
-        SDL_Delay(1000 / FPS_RATE);
+        SDL_Delay(1000 / DELAY);
     } while (x1_from != x1_to);
 
 
@@ -181,7 +185,7 @@ void drawDiscMoveAnimation(int peg_from, int peg_to, int disctopush) {
             filledRect(x1_from, y1_from, x2_from, y2_from, RED);
         }
         updateScreen();
-        SDL_Delay(1000 / FPS_RATE);
+        SDL_Delay(1000 / DELAY);
     } while (y1_from != y1_to);
 
 }
@@ -205,7 +209,7 @@ void keyDetect() {
     //Detects keyinput and triggers adequate actions
     int key1 = getkey();
     //Preventing memory errors caused by assigning SDLK_ESCAPE code to the disctopush
-    if (key1 == 27) //27 is the actual SDLK_ESCAPE code
+    if (key1 == 27) //27 is the SDLK_ESCAPE code
         exit(1);
     else {
         if (key1 == 48)
