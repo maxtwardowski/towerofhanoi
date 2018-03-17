@@ -2,15 +2,11 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define DISCS 3
+#define DISCS 50
 #define PEGS 3
 #define FPS_RATE 700
-#define DISC_WIDTH 80
 #define DISC_HEIGHT 20
-#define PEG_WIDTH 15
-#define PEG_HEIGHT 170
 #define PEG_HEIGHT_THRESHOLD 99
-#define DISC_THRESHOLD 51
 
 int gameboard[DISCS][PEGS];
 int stack_info[PEGS];
