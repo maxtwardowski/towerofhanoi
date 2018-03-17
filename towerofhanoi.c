@@ -133,7 +133,8 @@ void drawDiscMoveAnimation(int peg_from, int peg_to, int disctopush) {
         x1_to = x1_base * (peg_to + 1) - x1_base / 2 * disctopush / DISCS,
         y1_to = y1_base - heightstep * (stack_info[peg_to] + 1);
 
-
+    //Simulating 'sliding' out of the peg
+    //(going up before animating X and Y axis')
     do {
         cleanScreen();
         drawPegs(PEGS);
