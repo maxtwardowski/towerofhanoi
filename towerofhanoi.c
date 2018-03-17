@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define DISCS 50
-#define PEGS 10
+#define DISCS 3
+#define PEGS 3
 #define FPS_RATE 700
 #define DISC_HEIGHT 20
 #define PEG_HEIGHT_THRESHOLD 99
@@ -205,7 +205,7 @@ void keyDetect() {
     //Detects keyinput and triggers adequate actions
     int key1 = getkey();
     //Preventing memory errors caused by assigning SDLK_ESCAPE code to the disctopush
-    if (key1 == 27)
+    if (key1 == 27) //27 is the actual SDLK_ESCAPE code
         exit(1);
     else {
         if (key1 == 48)
