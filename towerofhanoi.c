@@ -83,7 +83,7 @@ void drawPegs(int pegs_number) {
         y1_base = screenHeight() - DISC_HEIGHT * (PEG_HEIGHT_THRESHOLD - DISCS) / PEG_HEIGHT_THRESHOLD * (DISCS + 1),
         x2_base = screenWidth() / (pegs_number + 1),
         y2_base = screenHeight(),
-        peg_width = DISC_WIDTH / DISCS;
+        peg_width = x1_base / 2 / DISCS;
 
     for (int i = 0; i < pegs_number; i++) {
         x1 += x1_base;
@@ -215,9 +215,14 @@ void keyDetect() {
 }
 
 void checkWin() {
-    //Checks if the win state occurs and finished the gameplay if it does
-    if (stack_info[DISCS - 1] == DISCS - 1)
+    //Checks if the win state occurs
+    //If it does, goodbye text is drawn and the program terminates
+    if (stack_info[DISCS - 1] == DISCS - 1) {
+        textout(screenWidth() / 2 - 120, screenHeight() / 2, "Congratulations, you won!", GREEN);
+        updateScreen();
+        SDL_Delay(2000);
         exit(1);
+    }
 }
 
 void testPrint_gameboard() {
