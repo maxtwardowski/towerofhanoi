@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <math.h>
 
+#define DISCS 3
+#define PEGS 3
 #define FPS_RATE 700
-#define DISCS 50
-#define PEGS 10
 #define DISC_WIDTH 80
 #define DISC_HEIGHT 20
 #define PEG_WIDTH 15
@@ -96,7 +96,7 @@ void drawDiscs() {
     //Draws discs on the pegs according to the gameboard and stack_info data
     int x1_base = screenWidth() / (PEGS + 1),
         y1_base = screenHeight(),
-        x2_base = screenWidth() / (PEGS + 1),
+        x2_base = x1_base,
         y2_base = screenHeight() - DISC_HEIGHT * (PEG_HEIGHT_THRESHOLD - DISCS) / PEG_HEIGHT_THRESHOLD;
 
     int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
@@ -126,13 +126,14 @@ void drawDiscMoveAnimation(int peg_from, int peg_to, int disctopush) {
         x2_base = screenWidth() / (PEGS + 1),
         y2_base = screenHeight() - heightstep;
 
-    int x1_from = x1_base * (peg_from + 1) - DISC_WIDTH * disctopush / DISCS,
+    int x1_from = x1_base * (peg_from + 1) - x1_base / 2 * disctopush / DISCS,
         y1_from = y1_base - heightstep * (stack_info[peg_from] + 1),
-        x2_from = x2_base * (peg_from + 1) + DISC_WIDTH * disctopush / DISCS,
+        x2_from = x2_base * (peg_from + 1) + x1_base / 2 * disctopush / DISCS,
         y2_from = y2_base - heightstep * (stack_info[peg_from] + 1),
-        x1_to = x1_base * (peg_to + 1) - DISC_WIDTH * disctopush / DISCS,
+        x1_to = x1_base * (peg_to + 1) - x1_base / 2 * disctopush / DISCS,
         y1_to = y1_base - heightstep * (stack_info[peg_to] + 1);
 
+    //Simulating X axis animation
     do {
         cleanScreen();
         drawPegs(PEGS);
@@ -153,6 +154,7 @@ void drawDiscMoveAnimation(int peg_from, int peg_to, int disctopush) {
         SDL_Delay(1000 / FPS_RATE);
     } while (x1_from != x1_to);
 
+    //Simulating Y axis animation
     do {
         cleanScreen();
         drawPegs(PEGS);
