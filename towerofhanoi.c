@@ -3,8 +3,8 @@
 #include <math.h>
 
 #define FPS_RATE 700
-#define DISCS 3
-#define PEGS 3
+#define DISCS 50
+#define PEGS 10
 #define DISC_WIDTH 80
 #define DISC_HEIGHT 20
 #define PEG_WIDTH 15
@@ -49,6 +49,7 @@ int main(int argc, char* argv[]) {
 }
 
 void setDefault_gameboard() {
+    //Sets default values for gameboard
     for (int i = 0; i < PEGS; i++) {
         for (int j = 0; j < DISCS; j++) {
             if (i == 0)
@@ -60,6 +61,7 @@ void setDefault_gameboard() {
 }
 
 void setDefault_stack() {
+    //Sets default values for stack_info
     for (int i = 0; i < PEGS; i++) {
         if (!i)
             stack_info[i] = DISCS - 1;
@@ -69,10 +71,12 @@ void setDefault_stack() {
 }
 
 void cleanScreen() {
+    //Cleans the screen drawing a black background
 	filledRect(0, 0, screenWidth(), screenHeight(), BLACK);
 }
 
 void drawPegs(int pegs_number) {
+    //Draws the given number of pegs
     int x1 = 0,
         x2 = 0,
         x1_base = screenWidth() / (pegs_number + 1),
@@ -88,8 +92,8 @@ void drawPegs(int pegs_number) {
     }
 }
 
-//LATER: remove duplicate variables
 void drawDiscs() {
+    //Draws discs on the pegs according to the gameboard and stack_info data
     int x1_base = screenWidth() / (PEGS + 1),
         y1_base = screenHeight(),
         x2_base = screenWidth() / (PEGS + 1),
@@ -115,6 +119,7 @@ void drawDiscs() {
 }
 
 void drawDiscMoveAnimation(int peg_from, int peg_to, int disctopush) {
+    //Animates the action of moving a disc from one peg to another
     int heightstep = DISC_HEIGHT * (PEG_HEIGHT_THRESHOLD - DISCS) / PEG_HEIGHT_THRESHOLD,
         x1_base = screenWidth() / (PEGS + 1),
         y1_base = screenHeight(),
@@ -167,9 +172,10 @@ void drawDiscMoveAnimation(int peg_from, int peg_to, int disctopush) {
 }
 
 void moveDisc(int peg_from, int peg_to) {
+    //Moves disc from one peg to another
+    //by manipulating the gameboard and stack_info
     if (stack_info[peg_from] != -1) {
         int disctopush = gameboard[stack_info[peg_from]][peg_from];
-
         if (stack_info[peg_to] == -1 || gameboard[stack_info[peg_to]][peg_to] > disctopush) {
             gameboard[stack_info[peg_from]][peg_from] = 0; //Indicating empty stack slot
             stack_info[peg_from]--; //Decreasing the origin stack index
@@ -181,6 +187,7 @@ void moveDisc(int peg_from, int peg_to) {
 }
 
 void keyDetect() {
+    //Detects keyinput and triggers adequate actions
     int key1 = getkey();
     //Preventing memory errors caused by assigning SDLK_ESCAPE code to the disctopush
     if (key1 == 27)
@@ -206,11 +213,13 @@ void keyDetect() {
 }
 
 void checkWin() {
+    //Checks if the win state occurs and finished the gameplay if it does
     if (stack_info[DISCS - 1] == DISCS - 1)
         exit(1);
 }
 
 void testPrint_gameboard() {
+    //Use for checking the content of gameboard
     printf("\n====GAMEBOARD TEST====\n");
     for (int i = 0; i < PEGS; i++) {
         for (int j = 0; j < DISCS; j++) {
@@ -221,6 +230,7 @@ void testPrint_gameboard() {
 }
 
 void testPrint_stack() {
+    //Use for checking the content of stack_info
     printf("\n====STACKTEST====\n");
     for (int i = 0; i < PEGS; i++)
         printf("%d\n", stack_info[i]);
