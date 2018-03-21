@@ -3,7 +3,7 @@
 #include <math.h>
 
 #define DISCS 3
-#define PEGS 3
+#define PEGS 10
 #define DELAY 800
 
 int gameboard[DISCS][PEGS];
@@ -71,9 +71,9 @@ void cleanScreen() {
 
 void drawPegs(int pegs_number) {
     //Draws the given number of pegs
-    int base_disc_height = 20,
-        peg_height_threshold = 99,
-        x1 = 0,
+    const int base_disc_height = 20,
+			  peg_height_threshold = 99;
+        int x1 = 0,
         x2 = 0,
         x1_base = screenWidth() / (pegs_number + 1),
         y1_base = screenHeight() - base_disc_height * (peg_height_threshold - DISCS) / peg_height_threshold * (DISCS + 1),
@@ -90,9 +90,9 @@ void drawPegs(int pegs_number) {
 
 void drawDiscs() {
     //Draws discs on the pegs according to the gameboard and stack_info data
-    int peg_height_threshold = 99,
-        base_disc_height = 20,
-        x1_base = screenWidth() / (PEGS + 1),
+    const int peg_height_threshold = 99,
+			  base_disc_height = 20;
+    int x1_base = screenWidth() / (PEGS + 1),
         y1_base = screenHeight(),
         x2_base = x1_base,
         y2_base = screenHeight() - base_disc_height * (peg_height_threshold - DISCS) / peg_height_threshold;
@@ -118,9 +118,9 @@ void drawDiscs() {
 
 void drawDiscMoveAnimation(int peg_from, int peg_to, int disctopush) {
     //Animates the action of moving a disc from one peg to another
-    int peg_height_threshold = 99,
-        base_disc_height = 20,
-        heightstep = base_disc_height * (peg_height_threshold - DISCS) / peg_height_threshold,
+    const int peg_height_threshold = 99,
+			  base_disc_height = 20;
+    int heightstep = base_disc_height * (peg_height_threshold - DISCS) / peg_height_threshold,
         x1_base = screenWidth() / (PEGS + 1),
         y1_base = screenHeight(),
         x2_base = screenWidth() / (PEGS + 1),
@@ -210,22 +210,22 @@ void keyDetect() {
     //Detects keyinput and triggers adequate actions
     int key1 = getkey();
     //Preventing memory errors caused by assigning SDLK_ESCAPE code to the disctopush
-    if (key1 == 27) //27 is the SDLK_ESCAPE code
+    if (key1 == SDLK_ESCAPE)
         exit(1);
     else {
-        if (key1 == 48)
-            key1 = 9;
+        if (key1 == SDLK_0)
+            key1 = SDLK_9 - SDLK_0;
         else
-            key1 -= 49; //Subtracting 49 to 'convert' the keycode to its actual value (0 acts like 10 though)
+            key1 -= SDLK_1; //Subtracting 49 to 'convert' the keycode to its actual value (0 acts like 10 though)
 
         //Not allowing the secong key if impossible action triggered
         //so that no unnecessary read-outs occur
         if (stack_info[key1] != -1 && key1 < PEGS) {
             int key2 = getkey();
-            if (key2 == 48)
-                key2 = 9;
+            if (key2 == SDLK_0)
+                key2 = SDLK_9 - SDLK_0;
             else
-                key2 -= 49;
+                key2 -= SDLK_1;
             if (key1 < PEGS && key2 < PEGS) //Protection against moving disc to an unexisting peg
                 moveDisc(key1, key2);
         }
